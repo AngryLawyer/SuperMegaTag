@@ -1,0 +1,15 @@
+[package]
+
+name = "SuperMegaTag"
+version = "0.0.1"
+authors = ["Tony Aldridge <tony@angry-lawyer.com>"]
+
+[[bin]]
+
+name = "supermegatag"
+path = "src/client.rs"
+
+[[bin]]
+
+name = "supermegatag_server"
+path = "src/server.rs"
