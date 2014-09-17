@@ -7,6 +7,12 @@ use std::io::net::ip::{Ipv4Addr, SocketAddr};
 use piston::{EventIterator, EventSettings, WindowSettings, NoWindow};
 use string_telephone::{Server, ConnectionConfig, UserPacket};
 
+struct Player {
+    controller: SocketAddr,
+    x: uint,
+    y: uint
+}
+
 fn deserializer(message: &Vec<u8>) -> String {
     match String::from_utf8_lossy(message.as_slice()) {
         Slice(slice) => slice.to_string(),
@@ -49,19 +55,18 @@ fn main() {
 
     for e in EventIterator::new(&mut window, &game_iter_settings) {
         loop {
-            loop {
-                match server.poll() {
-                    Some((UserPacket(packet), _)) => {
-                        server.send_to_all(&packet);
-                    },
-                    Some(_) => (),
-                    None => break
-                }
-            };
-            let culled = server.cull();
-            if culled.len() > 0 {
-                println!("{}", culled);
+            match server.poll() {
+                Some((UserPacket(packet), _)) => {
+                    //Do something
+                },
+                Some(_) => (),
+                None => break
             }
+        };
+
+        let culled = server.cull();
+        if culled.len() > 0 {
+            println!("{}", culled);
         }
     }
 }
