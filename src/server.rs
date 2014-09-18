@@ -6,11 +6,51 @@ use collections::str::{Slice, Owned};
 use std::io::net::ip::{Ipv4Addr, SocketAddr};
 use piston::{EventIterator, EventSettings, WindowSettings, NoWindow};
 use string_telephone::{Server, ConnectionConfig, UserPacket};
+use std::fmt;
 
 struct Player {
     controller: SocketAddr,
-    x: uint,
-    y: uint
+    x: i32,
+    y: i32,
+
+    keyUp: bool,
+    keyDown: bool,
+    keyLeft: bool,
+    keyRight: bool
+}
+
+impl Player {
+    pub fn new (controller: SocketAddr, x: i32, y: i32) -> Player {
+        Player {
+            controller: controller,
+            x: x,
+            y: y,
+            keyUp: false,
+            keyDown: false,
+            keyLeft: false,
+            keyRight: false
+        }
+    }
+
+    pub fn move(&mut self) {
+        if self.keyUp && self.y > 0 {
+            self.y -= 1;
+        } else if self.keyDown && self.y < 600 {
+            self.y += 1;
+        }
+
+        if self.keyLeft && self.x > 0 {
+            self.x -= 1;
+        } else if self.keyRight && self.x < 800{
+            self.x += 1;
+        }
+    }
+}
+
+impl fmt::Show for Player {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} at {} {}", self.controller, self.x, self.y)
+    }
 }
 
 fn deserializer(message: &Vec<u8>) -> String {
@@ -53,20 +93,34 @@ fn main() {
         Err(e) => fail!("Failed to start listening - {}", e)
     };
 
-    for e in EventIterator::new(&mut window, &game_iter_settings) {
-        loop {
-            match server.poll() {
-                Some((UserPacket(packet), _)) => {
-                    //Do something
-                },
-                Some(_) => (),
-                None => break
-            }
-        };
+    let mut players:Vec<Player> = vec![
+        Player::new(SocketAddr {ip: Ipv4Addr(0, 0, 0, 0), port: 8869}, 400, 300)
+    ];
 
-        let culled = server.cull();
-        if culled.len() > 0 {
-            println!("{}", culled);
+    for e in EventIterator::new(&mut window, &game_iter_settings) {
+        match e {
+            piston::Update(update_args) => {
+                loop {
+                    match server.poll() {
+                        Some((UserPacket(packet), _)) => {
+                            //Do something
+                        },
+                        Some(_) => (),
+                        None => break
+                    }
+                };
+
+                //Update the game world
+                for player in players.iter_mut() {
+                    player.move()
+                }
+                println!("{}", players);
+                let culled = server.cull();
+                if culled.len() > 0 {
+                    println!("{}", culled);
+                }
+            },
+            _ => ()
         }
     }
 }
