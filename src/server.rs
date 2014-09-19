@@ -7,6 +7,8 @@ use std::io::net::ip::{Ipv4Addr, SocketAddr};
 use piston::{EventIterator, EventSettings, WindowSettings, NoWindow};
 use string_telephone::{Server, ConnectionConfig, UserPacket, Command, PacketDisconnect, PacketConnect};
 use std::fmt;
+use std::rand;
+use std::rand::Rng;
 
 struct Player {
     controller: SocketAddr,
@@ -93,9 +95,8 @@ fn main() {
         Err(e) => fail!("Failed to start listening - {}", e)
     };
 
-    let mut players:Vec<Player> = vec![
-        Player::new(SocketAddr {ip: Ipv4Addr(0, 0, 0, 0), port: 8869}, 400, 300)
-    ];
+    let mut players:Vec<Player> = vec![];
+    let mut rng = rand::task_rng();
 
     for e in EventIterator::new(&mut window, &game_iter_settings) {
         match e {
@@ -103,10 +104,10 @@ fn main() {
                 loop {
                     match server.poll() {
                         Some((Command(PacketConnect), addr_from)) => {
-                            //New player!
+                            players.push(Player::new(addr_from, rng.gen::<uint>() as i32 % 800, rng.gen::<uint>() as i32 % 600));
                         },
                         Some((Command(PacketDisconnect), addr_from)) => {
-                            //Ohnoes
+                            players = players.into_iter().filter(|&player| &player.controller != &addr_from).collect()
                         },
                         Some((UserPacket(packet), _)) => {
                             //Do something
@@ -120,10 +121,10 @@ fn main() {
                 for player in players.iter_mut() {
                     player.move()
                 }
-                println!("{}", players);
+                
                 let culled = server.cull();
                 if culled.len() > 0 {
-                    println!("{}", culled);
+                    players = players.into_iter().filter(|&player| culled.contains(&player.controller) == false).collect()
                 }
             },
             _ => ()
