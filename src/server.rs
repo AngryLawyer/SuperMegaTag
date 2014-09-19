@@ -5,7 +5,7 @@ extern crate collections;
 use collections::str::{Slice, Owned};
 use std::io::net::ip::{Ipv4Addr, SocketAddr};
 use piston::{EventIterator, EventSettings, WindowSettings, NoWindow};
-use string_telephone::{Server, ConnectionConfig, UserPacket};
+use string_telephone::{Server, ConnectionConfig, UserPacket, Command, PacketDisconnect, PacketConnect};
 use std::fmt;
 
 struct Player {
@@ -102,6 +102,12 @@ fn main() {
             piston::Update(update_args) => {
                 loop {
                     match server.poll() {
+                        Some((Command(PacketConnect), addr_from)) => {
+                            //New player!
+                        },
+                        Some((Command(PacketDisconnect), addr_from)) => {
+                            //Ohnoes
+                        },
                         Some((UserPacket(packet), _)) => {
                             //Do something
                         },
