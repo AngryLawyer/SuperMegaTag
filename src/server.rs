@@ -104,9 +104,11 @@ fn main() {
                 loop {
                     match server.poll() {
                         Some((Command(PacketConnect), addr_from)) => {
-                            players.push(Player::new(addr_from, rng.gen::<uint>() as i32 % 800, rng.gen::<uint>() as i32 % 600));
+                            println!("{} connected", addr_from);
+                            players.push(Player::new(addr_from, (rng.gen::<u32>() % 800) as i32, (rng.gen::<u32>() % 600) as i32));
                         },
                         Some((Command(PacketDisconnect), addr_from)) => {
+                            println!("{} disconnected", addr_from);
                             players = players.into_iter().filter(|&player| &player.controller != &addr_from).collect()
                         },
                         Some((UserPacket(packet), _)) => {
@@ -121,9 +123,11 @@ fn main() {
                 for player in players.iter_mut() {
                     player.move()
                 }
+                println!("{}", players);
                 
                 let culled = server.cull();
                 if culled.len() > 0 {
+                    println!("{} timed out", culled);
                     players = players.into_iter().filter(|&player| culled.contains(&player.controller) == false).collect()
                 }
             },
