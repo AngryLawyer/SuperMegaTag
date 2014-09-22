@@ -111,7 +111,7 @@ fn main() {
                 widget_matrix::draw(
                     4, // cols.
                     1, // rows.
-                    Point::new(300.0, 270.0, 0.0), // matrix position.
+                    Point::new(0.0, 56.0, 0.0), // matrix position.
                     300.0, // width.
                     240.0, // height.
                     |num, col, row, pos, width, height| { // This is called for every widget.
@@ -121,11 +121,20 @@ fn main() {
                             .dimensions(width, 36.0)
                             .position(pos.x, pos.y)
                             .frame(2.0, Color::black())
-                            //.color(Color::new(1.0, 0.0, 0.0, 1.0))
+                            .color(Color::black())
                             .draw(gl);
 
                     }
                 );
+
+                uic.button(7u64)
+                    .dimensions(90.0, 36.0)
+                    .position(0.0, 128.0)
+                    .color(Color::black())
+                    .frame(2.0, Color::black())
+                    .label("Connect", 24u32, Color::white())
+                    .callback(|| () )
+                    .draw(gl);
 
             },
             _ => {},
