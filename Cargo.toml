@@ -28,3 +28,6 @@ git = "https://github.com/pistondevelopers/opengl_graphics"
 
 [dependencies.string_telephone]
 git = "https://github.com/AngryLawyer/string-telephone.git"
+
+[dependencies.conrod]
+git = "https://github.com/PistonDevelopers/conrod.git"
