@@ -15,6 +15,25 @@ use opengl_graphics::{
 
 use conrod::{
     UIContext,
+    label,
+    Color,
+    Point,
+    widget_matrix,
+    Button,
+    Callable,
+    Colorable,
+    Drawable,
+    DropDownList,
+    EnvelopeEditor,
+    Frameable,
+    Labelable,
+    NumberDialer,
+    Positionable,
+    Slider,
+    Shapeable,
+    TextBox,
+    Toggle,
+    XYPad,
 };
 
 use collections::str::{Slice, Owned};
@@ -43,12 +62,12 @@ fn main() {
         packet_serializer: serializer
     };
 
-    let mut client = match Client::connect(SocketAddr {ip: Ipv4Addr(0, 0, 0, 0), port: 0}, SocketAddr {ip: Ipv4Addr(127, 0, 0, 1), port: 8869}, settings) {
+    /*let mut client = match Client::connect(SocketAddr {ip: Ipv4Addr(0, 0, 0, 0), port: 0}, SocketAddr {ip: Ipv4Addr(127, 0, 0, 1), port: 8869}, settings) {
         Ok(client) => {
             client
         },
         Err(e) => fail!("Failed to connect - {}", e)
-    };
+    };*/
 
     let opengl = piston::shader_version::opengl::OpenGL_3_2;
     let mut window = WindowSDL2::new(
@@ -58,7 +77,7 @@ fn main() {
             size: [800, 600],
             fullscreen: false,
             exit_on_esc: true,
-            samples: 0,
+            samples: 4,
         }
     );
 
@@ -68,14 +87,46 @@ fn main() {
     };
     let ref mut gl = Gl::new(opengl);
 
-    let mut uic = UIContext::new("Dense-Regular.otf");
-    for e in EventIterator::new(&mut window, &event_settings) {
+    let ref mut uic = UIContext::new("Dense-Regular.otf");
+
+    let mut edit_ip = vec!["127".to_string(), "0".to_string(), "0".to_string(), "1".to_string()];
+
+    for ref e in EventIterator::new(&mut window, &event_settings) {
+        uic.handle_event(e);
         match e {
-            Render(args) => {
+            &Render(args) => {
                 gl.viewport(0, 0, args.width as i32, args.height as i32);
 
-                let c = graphics::Context::abs(args.width as f64, args.height as f64);
+                let c = &graphics::Context::abs(args.width as f64, args.height as f64);
                 c.rgb(1.0, 1.0, 1.0).draw(gl);
+                label::draw(
+                    gl,
+                    uic,
+                    Point::new(0f64, 0f64, 0f64), // Screen position.
+                    48u32, // Font size.
+                    Color::new(1.0, 0.0, 0.0, 1.0),
+                    "Select a server"
+                );
+
+                widget_matrix::draw(
+                    4, // cols.
+                    1, // rows.
+                    Point::new(300.0, 270.0, 0.0), // matrix position.
+                    300.0, // width.
+                    240.0, // height.
+                    |num, col, row, pos, width, height| { // This is called for every widget.
+                        // Now draw the widgets with the given callback.
+                        uic.text_box(2 + num as u64, edit_ip.get_mut(num))
+                            .font_size(24u32)
+                            .dimensions(width, 36.0)
+                            .position(pos.x, pos.y)
+                            .frame(2.0, Color::black())
+                            //.color(Color::new(1.0, 0.0, 0.0, 1.0))
+                            .draw(gl);
+
+                    }
+                );
+
             },
             _ => {},
         }
