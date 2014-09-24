@@ -43,32 +43,9 @@ use piston::graphics::{AddColor, Draw};
 use string_telephone::{Client, ConnectionConfig, UserPacket, Command, PacketDisconnect, PacketConnect};
 use sdl2_game_window::WindowSDL2;
 
-trait Scene<T> {
-    fn handle_event(&mut self, e: &Event, state: &T);
-}
-
-struct ConnectScene<T>;
-
-impl <T> Scene<uint> for ConnectScene <T> {
-    fn handle_event(&mut self, e: &Event, state: &uint) {
-    }
-}
-
-struct SceneManager <T> {
-    current_scene: Box<Scene<T> + 'static>
-}
-
-impl <T> SceneManager <T> {
-    pub fn new(initial_scene: Box<Scene<T> + 'static>) -> SceneManager<T> {
-        SceneManager {
-            current_scene: initial_scene
-        }
-    }
-
-    pub fn set_scene(&mut self, new_scene: Box<Scene<T> + 'static>) {
-        self.current_scene = new_scene
-    }
-}
+pub mod scene;
+pub mod connectscene;
+pub mod gamestate;
 
 fn deserializer(message: &Vec<u8>) -> String {
     match String::from_utf8_lossy(message.as_slice()) {
@@ -118,7 +95,7 @@ fn main() {
 
     let mut edit_ip = vec!["127".to_string(), "0".to_string(), "0".to_string(), "1".to_string()];
 
-    let mut manager = SceneManager::new(box ConnectScene::<uint>);
+    let mut manager = scene::SceneManager::new(box connectscene::ConnectScene::<gamestate::GameState>);
 
     for ref e in EventIterator::new(&mut window, &event_settings) {
         uic.handle_event(e);
