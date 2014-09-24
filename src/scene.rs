@@ -18,4 +18,8 @@ impl <T> SceneManager <T> {
     pub fn set_scene(&mut self, new_scene: Box<Scene<T> + 'static>) {
         self.current_scene = new_scene
     }
+
+    pub fn handle_event(&mut self, e: &Event, state: &mut T) {
+        self.current_scene.handle_event(e, state);
+    }
 }
