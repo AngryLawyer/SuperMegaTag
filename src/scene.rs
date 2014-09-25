@@ -16,7 +16,7 @@ impl <T> SceneManager <T> {
     }
 
     pub fn set_scene(&mut self, new_scene: Box<Scene<T> + 'static>) {
-        self.current_scene = new_scene
+        self.current_scene = Some(new_scene)
     }
 
     pub fn handle_event(&mut self, e: &Event, state: &mut T) {
@@ -26,5 +26,8 @@ impl <T> SceneManager <T> {
             },
             None => ()
         }
+    }
+
+    pub fn 'initialize(&mut self, constructor: fn(&mut SceneManager<T>) -> Scene<T>) {
     }
 }

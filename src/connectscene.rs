@@ -19,7 +19,7 @@ use conrod::{
 use piston::{graphics, Render, Event};
 use piston::graphics::{AddColor, Draw};
 
-pub struct ConnectScene<'r, T> {
+pub struct ConnectScene<'r, T:'r> {
     manager: &'r mut SceneManager<T>,
     pub edit_ip: Vec<String>
 }
