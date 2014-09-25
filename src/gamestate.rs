@@ -3,8 +3,7 @@ use conrod::{
 };
 
 use opengl_graphics::{
-    Gl,
-    Texture,
+    Gl
 };
 
 pub struct GameState {

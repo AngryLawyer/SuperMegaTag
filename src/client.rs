@@ -9,15 +9,13 @@ extern crate opengl_graphics;
 extern crate sdl2_game_window;
 
 use opengl_graphics::{
-    Gl,
-    Texture,
+    Gl
 };
 use conrod::UIContext;
 
 use collections::str::{Slice, Owned};
-use std::io::net::ip::{Ipv4Addr, SocketAddr};
-use piston::{EventIterator, EventSettings, WindowSettings, graphics, Render, Event};
-use string_telephone::{Client, ConnectionConfig, UserPacket, Command, PacketDisconnect, PacketConnect};
+use piston::{EventIterator, EventSettings, WindowSettings};
+use string_telephone::ConnectionConfig;
 use sdl2_game_window::WindowSDL2;
 
 pub mod scene;

@@ -1,7 +1,6 @@
-use scene::Scene;
+use scene::{Scene, SceneManager};
 use gamestate::GameState;
 use conrod::{
-    UIContext,
     label,
     Color,
     Point,
@@ -10,20 +9,14 @@ use conrod::{
     Callable,
     Colorable,
     Drawable,
-    DropDownList,
-    EnvelopeEditor,
     Frameable,
     Labelable,
-    NumberDialer,
     Positionable,
-    Slider,
     Shapeable,
     TextBox,
-    Toggle,
-    XYPad,
 };
 
-use piston::{EventIterator, EventSettings, WindowSettings, graphics, Render, Event};
+use piston::{graphics, Render, Event};
 use piston::graphics::{AddColor, Draw};
 
 pub struct ConnectScene<T> {
@@ -40,7 +33,7 @@ impl <T> ConnectScene<T> {
 }
 
 impl <T> Scene<GameState> for ConnectScene <T> {
-    fn handle_event(&mut self, e: &Event, state: &mut GameState) {
+    fn handle_event(&mut self, e: &Event, state: &mut GameState, manager: &mut SceneManager<GameState>) {
         match e {
             &Render(args) => {
                 let (uic, gl) = state.get_drawables();
@@ -66,7 +59,7 @@ impl <T> Scene<GameState> for ConnectScene <T> {
                     Point::new(0.0, 56.0, 0.0), // matrix position.
                     300.0, // width.
                     240.0, // height.
-                    |num, col, row, pos, width, height| { // This is called for every widget.
+                    |num, _, _, pos, width, _| { // This is called for every widget.
                         // Now draw the widgets with the given callback.
                         uic.text_box(2 + num as u64, self.edit_ip.get_mut(num))
                             .font_size(24u32)
