@@ -1,7 +1,8 @@
-use piston::{Event};
+use piston::{Event, Update};
 
 pub trait Scene<T> {
     fn handle_event(&mut self, e: &Event, state: &mut T);
+    fn should_transition(&self) -> Option<Box<Scene<T> + 'static>>;
 }
 
 pub struct SceneManager <T> {
@@ -21,5 +22,17 @@ impl <T> SceneManager <T> {
 
     pub fn handle_event(&mut self, e: &Event, state: &mut T) {
         self.current_scene.handle_event(e, state);
+        match e {
+            &Update(_) => {
+                let maybe_new_scene = self.current_scene.should_transition();
+                match maybe_new_scene {
+                    Some(scene) => {
+                        self.set_scene(scene)
+                    },
+                    None => ()
+                }
+            },
+            _ => ()
+        }
     }
 }

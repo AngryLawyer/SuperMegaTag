@@ -85,4 +85,8 @@ impl <T> Scene<GameState> for ConnectScene <T> {
             _ => {},
         }
     }
+
+    fn should_transition(&self) -> Option<Box<Scene<GameState> + 'static>> {;
+        None
+    }
 }
