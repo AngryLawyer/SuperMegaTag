@@ -33,7 +33,7 @@ impl <T> ConnectScene<T> {
 }
 
 impl <T> Scene<GameState> for ConnectScene <T> {
-    fn handle_event(&mut self, e: &Event, state: &mut GameState, manager: &mut SceneManager<GameState>) {
+    fn handle_event(&mut self, e: &Event, state: &mut GameState) {
         match e {
             &Render(args) => {
                 let (uic, gl) = state.get_drawables();

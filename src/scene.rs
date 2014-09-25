@@ -1,7 +1,7 @@
 use piston::{Event};
 
 pub trait Scene<T> {
-    fn handle_event(&mut self, e: &Event, state: &mut T, manager: &mut SceneManager<T>);
+    fn handle_event(&mut self, e: &Event, state: &mut T);
 }
 
 pub struct SceneManager <T> {
@@ -20,6 +20,6 @@ impl <T> SceneManager <T> {
     }
 
     pub fn handle_event(&mut self, e: &Event, state: &mut T) {
-        self.current_scene.handle_event(e, state, self);
+        self.current_scene.handle_event(e, state);
     }
 }
