@@ -19,20 +19,22 @@ use conrod::{
 use piston::{graphics, Render, Event};
 use piston::graphics::{AddColor, Draw};
 
-pub struct ConnectScene<T> {
+pub struct ConnectScene<'r, T> {
+    manager: &'r mut SceneManager<T>,
     pub edit_ip: Vec<String>
 }
 
-impl <T> ConnectScene<T> {
+impl <'r, T> ConnectScene<'r, T> {
 
-    pub fn new() -> ConnectScene<T> {
+    pub fn new<'r> (manager: &'r mut SceneManager<T>) -> ConnectScene<'r, T> {
        ConnectScene {
+           manager: manager,
            edit_ip: vec!["127".to_string(), "0".to_string(), "0".to_string(), "1".to_string()]
        }
     }
 }
 
-impl <T> Scene<GameState> for ConnectScene <T> {
+impl <'r, T> Scene<GameState> for ConnectScene <'r, T> {
     fn handle_event(&mut self, e: &Event, state: &mut GameState) {
         match e {
             &Render(args) => {
@@ -84,9 +86,5 @@ impl <T> Scene<GameState> for ConnectScene <T> {
             },
             _ => {},
         }
-    }
-
-    fn should_transition(&self) -> Option<Box<Scene<GameState> + 'static>> {;
-        None
     }
 }
