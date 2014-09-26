@@ -80,7 +80,20 @@ impl <'r, T> Scene<GameState> for ConnectScene <'r, T> {
                     .color(Color::black())
                     .frame(2.0, Color::black())
                     .label("Connect", 24u32, Color::white())
-                    .callback(|| () )
+                    .callback(|| {
+                        let parsed = (from_str(self.edit_ip.get(0)), from_str(self.edit_ip.get(1)), from_str(self.edit_ip.get(2)), from_str(self.edit_ip.get(3)));
+                        match parsed {
+                            (Some(a), Some(b), Some(c), Some(d)) => {
+                                match Client::connect(SocketAddr {ip: Ipv4Addr(0, 0, 0, 0), port: 0}, SocketAddr {ip: Ipv4Addr(a, b, c, d), port: 8869}, settings) {
+                                    Ok(client) => {
+                                        ()
+                                    },
+                                    Err(e) => fail!("Failed to connect - {}", e)
+                                };
+                            },
+                            _ => ()
+                        };
+                    })
                     .draw(gl);
 
             },
