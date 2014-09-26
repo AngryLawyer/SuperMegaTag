@@ -28,6 +28,8 @@ impl <T> SceneManager <T> {
         }
     }
 
-    pub fn 'initialize(&mut self, constructor: fn(&mut SceneManager<T>) -> Scene<T>) {
+    pub fn initialize(&mut self, constructor: |&mut SceneManager<T>| -> Box<Scene<T> + 'static>) {
+        let constructed = constructor(self);
+        self.set_scene(constructed);
     }
 }
