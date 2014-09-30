@@ -20,14 +20,9 @@ use sdl2_game_window::WindowSDL2;
 pub mod scene;
 pub mod connectscene;
 pub mod gamestate;
+pub mod gamescene;
 
 fn main() {
-    /*let mut client = match Client::connect(SocketAddr {ip: Ipv4Addr(0, 0, 0, 0), port: 0}, SocketAddr {ip: Ipv4Addr(127, 0, 0, 1), port: 8869}, settings) {
-        Ok(client) => {
-            client
-        },
-        Err(e) => fail!("Failed to connect - {}", e)
-    };*/
 
     let opengl = piston::shader_version::opengl::OpenGL_3_2;
     let mut window = WindowSDL2::new(
@@ -49,7 +44,6 @@ fn main() {
     let mut manager = scene::SceneManager::new();
     let mut gamestate = gamestate::GameState::new(UIContext::new("Dense-Regular.otf"), Gl::new(opengl));
     manager.initialize(|manager| { box connectscene::ConnectScene::new(manager) });
-    //let mut connectscene = connectscene::ConnectScene::new(&mut manager);
 
     for ref e in EventIterator::new(&mut window, &event_settings) {
         gamestate.get_uic().handle_event(e);
