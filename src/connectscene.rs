@@ -40,15 +40,15 @@ fn serializer(packet: &String) -> Vec<u8> {
 }
 
 
-pub struct ConnectScene<'r, T:'r> {
-    manager: &'r mut SceneManager<T>,
+pub struct ConnectScene<'r> {
+    manager: &'r mut SceneManager,
     pub edit_ip: Vec<String>,
     try_connect: ConnectState,
 }
 
-impl <'r, T> ConnectScene<'r, T> {
+impl <'r> ConnectScene<'r> {
 
-    pub fn new<'r>(manager: &'r mut SceneManager<T>) -> ConnectScene<'r, T> {
+    pub fn new<'r>(manager: &'r mut SceneManager) -> ConnectScene<'r> {
        ConnectScene {
            manager: manager,
            edit_ip: vec!["127".to_string(), "0".to_string(), "0".to_string(), "1".to_string()],
@@ -61,7 +61,7 @@ impl <'r, T> ConnectScene<'r, T> {
     }
 }
 
-impl <'r, T> Scene<GameState> for ConnectScene <'r, T> {
+impl <'r> Scene for ConnectScene <'r> {
     fn handle_event(&mut self, e: &Event, state: &mut GameState) {
         match e {
             &Update(args) => {
@@ -70,7 +70,7 @@ impl <'r, T> Scene<GameState> for ConnectScene <'r, T> {
                         match socket.try_recv() {
                             Ok(Some(comms)) => {
                                 println!("Connected");
-                                self.manager.set_scene(box GameScene::new(self.manager));
+                                //self.manager.set_scene(box GameScene::new(self.manager));
                                 true
                             },
                             Ok(None) => {

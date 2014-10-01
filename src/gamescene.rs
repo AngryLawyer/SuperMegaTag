@@ -2,20 +2,20 @@ use scene::{Scene, SceneManager};
 use gamestate::GameState;
 use piston::{graphics, Render, Event, Update};
 
-pub struct GameScene<'r, T:'r> {
-    manager: &'r mut SceneManager<T>
+pub struct GameScene<'r> {
+    manager: &'r mut SceneManager
 }
 
-impl <'r, T> GameScene<'r, T> {
+impl <'r> GameScene<'r> {
 
-    pub fn new<'r>(manager: &'r mut SceneManager<T>) -> GameScene<'r, T> {
+    pub fn new<'r>(manager: &'r mut SceneManager) -> GameScene<'r> {
        GameScene {
            manager: manager,
        }
     }
 }
 
-impl <'r, T> Scene<GameState> for GameScene <'r, T> {
+impl <'r> Scene for GameScene <'r> {
     fn handle_event(&mut self, e: &Event, state: &mut GameState) {
     }
 }
