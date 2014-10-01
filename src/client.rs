@@ -43,7 +43,7 @@ fn main() {
 
     let mut manager = scene::SceneManager::new();
     let mut gamestate = gamestate::GameState::new(UIContext::new("Dense-Regular.otf"), Gl::new(opengl));
-    manager.initialize(|manager| { box connectscene::ConnectScene::new(manager) });
+    manager.set_scene(|manager| { box connectscene::ConnectScene::new(manager) });
 
     for ref e in EventIterator::new(&mut window, &event_settings) {
         gamestate.get_uic().handle_event(e);

@@ -70,7 +70,7 @@ impl <'r> Scene for ConnectScene <'r> {
                         match socket.try_recv() {
                             Ok(Some(comms)) => {
                                 println!("Connected");
-                                //self.manager.set_scene(box GameScene::new(self.manager));
+                                self.manager.set_scene(|manager| box GameScene::new(manager));
                                 true
                             },
                             Ok(None) => {
