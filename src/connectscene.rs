@@ -21,24 +21,12 @@ use conrod::{
 
 use piston::{graphics, Render, Event, Update};
 use piston::graphics::{AddColor, Draw};
-use collections::str::{Slice, Owned};
+use packet;
 
 enum ConnectState {
     Disconnected,
     Connecting(Receiver<Option<Client<String>>>)
 }
-
-fn deserializer(message: &Vec<u8>) -> String {
-    match String::from_utf8_lossy(message.as_slice()) {
-        Slice(slice) => slice.to_string(),
-        Owned(item) => item
-    }
-}
-
-fn serializer(packet: &String) -> Vec<u8> {
-    packet.clone().into_bytes()
-}
-
 
 pub struct ConnectScene<'r> {
     manager: &'r mut SceneManager,
@@ -142,8 +130,8 @@ impl <'r> Scene for ConnectScene <'r> {
                                         let settings = ConnectionConfig {
                                             protocol_id: 88869,
                                             timeout_period: 10,
-                                            packet_deserializer: deserializer,
-                                            packet_serializer: serializer
+                                            packet_deserializer: packet::deserializer,
+                                            packet_serializer: packet::serializer
                                         };
 
                                         println!("Connecting");

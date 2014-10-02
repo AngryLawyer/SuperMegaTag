@@ -2,13 +2,14 @@ extern crate piston;
 extern crate string_telephone;
 extern crate collections;
 
-use collections::str::{Slice, Owned};
 use std::io::net::ip::{Ipv4Addr, SocketAddr};
 use piston::{EventIterator, EventSettings, WindowSettings, NoWindow};
 use string_telephone::{Server, ConnectionConfig, UserPacket, Command, PacketDisconnect, PacketConnect};
 use std::fmt;
 use std::rand;
 use std::rand::Rng;
+
+pub mod packet;
 
 struct Player {
     controller: SocketAddr,
@@ -34,7 +35,7 @@ impl Player {
         }
     }
 
-    pub fn move(&mut self) {
+    pub fn think(&mut self) {
         if self.keyUp && self.y > 0 {
             self.y -= 1;
         } else if self.keyDown && self.y < 600 {
@@ -55,17 +56,6 @@ impl fmt::Show for Player {
     }
 }
 
-fn deserializer(message: &Vec<u8>) -> String {
-    match String::from_utf8_lossy(message.as_slice()) {
-        Slice(slice) => slice.to_string(),
-        Owned(item) => item
-    }
-}
-
-fn serializer(packet: &String) -> Vec<u8> {
-    packet.clone().into_bytes()
-}
-
 fn main() {
     let mut window = NoWindow::new(WindowSettings {
         title: "SuperMegaTag".to_string(),
@@ -83,8 +73,8 @@ fn main() {
     let settings = ConnectionConfig {
         protocol_id: 88869,
         timeout_period: 10,
-        packet_deserializer: deserializer,
-        packet_serializer: serializer
+        packet_deserializer: packet::deserializer,
+        packet_serializer: packet::serializer
     };
 
     let mut server = match Server::new(SocketAddr {ip: Ipv4Addr(0, 0, 0, 0), port: 8869}, settings) {
@@ -121,7 +111,7 @@ fn main() {
 
                 //Update the game world
                 for player in players.iter_mut() {
-                    player.move()
+                    player.think()
                 }
                 println!("{}", players);
                 

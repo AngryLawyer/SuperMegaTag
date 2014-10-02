@@ -21,6 +21,7 @@ pub mod scene;
 pub mod connectscene;
 pub mod gamestate;
 pub mod gamescene;
+pub mod packet;
 
 fn main() {
 
