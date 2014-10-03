@@ -5,56 +5,11 @@ extern crate collections;
 use std::io::net::ip::{Ipv4Addr, SocketAddr};
 use piston::{EventIterator, EventSettings, WindowSettings, NoWindow};
 use string_telephone::{Server, ConnectionConfig, UserPacket, Command, PacketDisconnect, PacketConnect};
-use std::fmt;
 use std::rand;
 use std::rand::Rng;
 
 pub mod packet;
-
-struct Player {
-    controller: SocketAddr,
-    x: i32,
-    y: i32,
-
-    keyUp: bool,
-    keyDown: bool,
-    keyLeft: bool,
-    keyRight: bool
-}
-
-impl Player {
-    pub fn new (controller: SocketAddr, x: i32, y: i32) -> Player {
-        Player {
-            controller: controller,
-            x: x,
-            y: y,
-            keyUp: false,
-            keyDown: false,
-            keyLeft: false,
-            keyRight: false
-        }
-    }
-
-    pub fn think(&mut self) {
-        if self.keyUp && self.y > 0 {
-            self.y -= 1;
-        } else if self.keyDown && self.y < 600 {
-            self.y += 1;
-        }
-
-        if self.keyLeft && self.x > 0 {
-            self.x -= 1;
-        } else if self.keyRight && self.x < 800{
-            self.x += 1;
-        }
-    }
-}
-
-impl fmt::Show for Player {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} at {} {}", self.controller, self.x, self.y)
-    }
-}
+pub mod player;
 
 fn main() {
     let mut window = NoWindow::new(WindowSettings {
@@ -85,8 +40,9 @@ fn main() {
         Err(e) => fail!("Failed to start listening - {}", e)
     };
 
-    let mut players:Vec<Player> = vec![];
+    let mut players:Vec<(SocketAddr, player::Player)> = vec![];
     let mut rng = rand::task_rng();
+    let mut player_counter = 0;
 
     for e in EventIterator::new(&mut window, &game_iter_settings) {
         match e {
@@ -95,11 +51,13 @@ fn main() {
                     match server.poll() {
                         Some((Command(PacketConnect), addr_from)) => {
                             println!("{} connected", addr_from);
-                            players.push(Player::new(addr_from, (rng.gen::<u32>() % 800) as i32, (rng.gen::<u32>() % 600) as i32));
+                            //TODO: Check this player doesn't already exist
+                            players.push((addr_from, player::Player::new(player_counter, (rng.gen::<u32>() % 800) as i32, (rng.gen::<u32>() % 600) as i32)));
+                            player_counter += 1;
                         },
                         Some((Command(PacketDisconnect), addr_from)) => {
                             println!("{} disconnected", addr_from);
-                            players = players.into_iter().filter(|&player| &player.controller != &addr_from).collect()
+                            players = players.into_iter().filter(|&(controller, _)| &controller != &addr_from).collect()
                         },
                         Some((UserPacket(packet), _)) => {
                             //Do something
@@ -110,7 +68,7 @@ fn main() {
                 };
 
                 //Update the game world
-                for player in players.iter_mut() {
+                for &(_, ref mut player) in players.iter_mut() {
                     player.think()
                 }
                 println!("{}", players);
@@ -118,7 +76,7 @@ fn main() {
                 let culled = server.cull();
                 if culled.len() > 0 {
                     println!("{} timed out", culled);
-                    players = players.into_iter().filter(|&player| culled.contains(&player.controller) == false).collect()
+                    players = players.into_iter().filter(|&(player, _)| culled.contains(&player) == false).collect()
                 }
             },
             _ => ()

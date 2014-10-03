@@ -25,7 +25,7 @@ use packet;
 
 enum ConnectState {
     Disconnected,
-    Connecting(Receiver<Option<Client<String>>>)
+    Connecting(Receiver<Option<Client<packet::Packet>>>)
 }
 
 pub struct ConnectScene<'r> {

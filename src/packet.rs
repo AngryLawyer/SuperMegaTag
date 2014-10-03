@@ -1,17 +1,14 @@
-use collections::str::{Slice, Owned};
+use player::Player;
 
 pub enum Packet {
-    ServerStatusPacket,
+    FullServerState(Vec<Player>),
     MovePacket
 }
 
-pub fn deserializer(message: &Vec<u8>) -> Packet {
-    match String::from_utf8_lossy(message.as_slice()) {
-        Slice(slice) => slice.to_string(),
-        Owned(item) => item
-    }
+pub fn deserializer(message: &Vec<u8>) -> Option<Packet> {
+    None
 }
 
 pub fn serializer(packet: &Packet) -> Vec<u8> {
-    packet.clone().into_bytes()
+    vec![]
 }
