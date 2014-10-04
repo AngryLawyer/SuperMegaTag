@@ -44,9 +44,15 @@ fn main() {
     let mut rng = rand::task_rng();
     let mut player_counter = 0;
 
+    let mut next_broadcast = 0f64;
+    let mut clock = 0f64;
+    //let clock_rate = 0.0015;
+    let broadcast_rate = 1.0 / 20.0;
+
     for e in EventIterator::new(&mut window, &game_iter_settings) {
         match e {
             piston::Update(update_args) => {
+                clock += update_args.dt;
                 loop {
                     match server.poll() {
                         Some((Command(PacketConnect), addr_from)) => {
@@ -68,15 +74,22 @@ fn main() {
                 };
 
                 //Update the game world
+                //TODO: 60fps
                 for &(_, ref mut player) in players.iter_mut() {
                     player.think()
                 }
-                println!("{}", players);
                 
                 let culled = server.cull();
                 if culled.len() > 0 {
                     println!("{} timed out", culled);
                     players = players.into_iter().filter(|&(player, _)| culled.contains(&player) == false).collect()
+                }
+
+                if clock >= next_broadcast {
+                    next_broadcast = clock + broadcast_rate;
+                    println!("Heartbeat! {}", clock);
+                    let serialized_state = packet::FullServerState(players.iter().map(|&(_, data)| data).collect());
+                    server.send_to_all(&serialized_state);
                 }
             },
             _ => ()

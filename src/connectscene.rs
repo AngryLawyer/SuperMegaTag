@@ -59,6 +59,7 @@ impl <'r> Scene for ConnectScene <'r> {
                             Ok(Some(comms)) => {
                                 println!("Connected");
                                 self.manager.set_scene(|manager| box GameScene::new(manager));
+                                state.set_comms(comms);
                                 true
                             },
                             Ok(None) => {
