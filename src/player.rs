@@ -2,7 +2,7 @@ use std::fmt;
 use packet::PacketSerialize;
 use std::io::{MemWriter, MemReader, IoError};
 
-enum PlayerFlags {
+pub enum PlayerFlags {
     UP = 0x0001,
     DOWN = 0x0002,
     LEFT = 0x0004,
@@ -12,7 +12,7 @@ enum PlayerFlags {
 
 #[deriving(Clone)]
 pub struct Player {
-    id: u16,
+    pub id: u16,
     pub x: i32,
     pub y: i32,
     key_up: bool,

@@ -65,7 +65,8 @@ fn main() {
                             println!("{} disconnected", addr_from);
                             players = players.into_iter().filter(|&(controller, _)| &controller != &addr_from).collect()
                         },
-                        Some((UserPacket(packet), _)) => {
+                        Some((UserPacket(packet::MovePacket(up, down, left, right)), addr_from)) => {
+                            //TODO: Respond to movement events
                             //Do something
                         },
                         Some(_) => (),
@@ -88,8 +89,10 @@ fn main() {
                 if clock >= next_broadcast {
                     next_broadcast = clock + broadcast_rate;
                     println!("Heartbeat! {}", clock);
-                    let serialized_state = packet::FullServerState(players.iter().map(|&(_, data)| data).collect());
-                    server.send_to_all(&serialized_state);
+                    let serialized_state: Vec<player::Player> = players.iter().map(|&(_, data)| data).collect();
+                    for &(ref user, ref data) in players.iter() {
+                        server.send_to(&packet::FullServerState(data.id, serialized_state.clone()), user);
+                    }
                 }
             },
             _ => ()
