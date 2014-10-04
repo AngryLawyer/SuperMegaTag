@@ -1,7 +1,7 @@
 use scene::{Scene, SceneManager};
 use gamestate::GameState;
 use piston::{graphics, Render, Event, Update};
-use piston::graphics::{AddColor, Draw};
+use piston::graphics::{AddColor, Draw, AddEllipse, AddBorder};
 use string_telephone::{Client, PollDisconnected};
 use packet;
 use player::Player;
@@ -47,9 +47,12 @@ impl <'r> Scene for GameScene <'r> {
                 gl.viewport(0, 0, args.width as i32, args.height as i32);
 
                 let c = &graphics::Context::abs(args.width as f64, args.height as f64);
-
-
                 c.rgb(1.0, 1.0, 1.0).draw(gl);
+
+                for player in self.players.iter() {
+                    c.rgb(0.0, 0.0, 0.0).circle(player.x as f64, player.y as f64, 10.0).draw(gl);
+                }
+
             },
             _ => ()
         }

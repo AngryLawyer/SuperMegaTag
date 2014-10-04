@@ -1,6 +1,6 @@
 use std::fmt;
 use packet::PacketSerialize;
-use std::io::MemWriter;
+use std::io::{MemWriter, MemReader, IoError};
 
 enum PlayerFlags {
     UP = 0x0001,
@@ -10,10 +10,11 @@ enum PlayerFlags {
     TAGGED = 0x0010
 }
 
+#[deriving(Clone)]
 pub struct Player {
     id: u16,
-    x: i32,
-    y: i32,
+    pub x: i32,
+    pub y: i32,
     key_up: bool,
     key_down: bool,
     key_left: bool,
@@ -63,6 +64,16 @@ impl Player {
         self.key_left = flags & LEFT as u8 > 0;
         self.key_right = flags & RIGHT as u8 > 0;
         self.is_tagged = flags & TAGGED as u8 > 0;
+    }
+
+    pub fn deserialize(reader: &mut MemReader) -> Result<Player, IoError> {
+        let id = try!(reader.read_be_u16());
+        let x = try!(reader.read_be_i32());
+        let y = try!(reader.read_be_i32());
+        let flags = try!(reader.read_u8());
+        let mut player = Player::new(id, x, y);
+        player.read_playerflags(flags);
+        Ok(player)
     }
 }
 

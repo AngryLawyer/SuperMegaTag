@@ -11,10 +11,17 @@ pub enum Packet {
 }
 
 pub fn deserializer(message: &Vec<u8>) -> Option<Packet> {
-    let mut r = MemReader::new(message);
+    let mut r = MemReader::new(message.clone());
     match r.read_u8() {
-        Some(0) => {
-            Player
+        Ok(0) => {
+            let mut result = vec![];
+            while r.eof() == false {
+                match Player::deserialize(&mut r) {
+                    Ok(player) => result.push(player),
+                    Err(_) => break
+                }
+            }
+            Some(FullServerState(result))
         },
         _ => None
     }
