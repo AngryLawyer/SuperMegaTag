@@ -7,7 +7,7 @@ use conrod::{
     label,
     Color,
     Point,
-    widget_matrix,
+    WidgetMatrix,
     Button,
     Callable,
     Colorable,
@@ -93,13 +93,10 @@ impl <'r> Scene for ConnectScene <'r> {
                     "Select a server"
                 );
 
-                widget_matrix::draw(
-                    4, // cols.
-                    1, // rows.
-                    Point::new(0.0, 56.0, 0.0), // matrix position.
-                    300.0, // width.
-                    240.0, // height.
-                    |num, _, _, pos, width, _| { // This is called for every widget.
+                uic.widget_matrix(4, 1)
+                    .position(0.0, 56.0)
+                    .dimensions(300.0, 240.0)
+                    .each_widget(|uic, num, _, _, pos, width, _| {
                         // Now draw the widgets with the given callback.
                         uic.text_box(2 + num as u64, self.edit_ip.get_mut(num))
                             .font_size(24u32)
@@ -109,8 +106,7 @@ impl <'r> Scene for ConnectScene <'r> {
                             .color(Color::black())
                             .draw(gl);
 
-                    }
-                );
+                    });
 
                 uic.button(7u64)
                     .dimensions(90.0, 36.0)
