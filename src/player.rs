@@ -15,11 +15,11 @@ pub struct Player {
     pub id: u16,
     pub x: i32,
     pub y: i32,
-    key_up: bool,
-    key_down: bool,
-    key_left: bool,
-    key_right: bool,
-    is_tagged: bool
+    pub key_up: bool,
+    pub key_down: bool,
+    pub key_left: bool,
+    pub key_right: bool,
+    pub is_tagged: bool
 }
 
 impl Player {

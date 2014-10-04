@@ -45,6 +45,7 @@ fn main() {
     let mut player_counter = 0;
 
     let mut next_broadcast = 0f64;
+    let mut next_think = 0f64;
     let mut clock = 0f64;
     //let clock_rate = 0.0015;
     let broadcast_rate = 1.0 / 20.0;
@@ -66,6 +67,15 @@ fn main() {
                             players = players.into_iter().filter(|&(controller, _)| &controller != &addr_from).collect()
                         },
                         Some((UserPacket(packet::MovePacket(up, down, left, right)), addr_from)) => {
+                            for &(controller, ref mut player) in players.iter_mut() {
+                                if controller == addr_from {
+                                    player.key_up = up;
+                                    player.key_down = down;
+                                    player.key_left = left;
+                                    player.key_right = right;
+                                    break;
+                                }
+                            };
                             //TODO: Respond to movement events
                             //Do something
                         },
@@ -75,9 +85,11 @@ fn main() {
                 };
 
                 //Update the game world
-                //TODO: 60fps
-                for &(_, ref mut player) in players.iter_mut() {
-                    player.think()
+                if clock >= next_think {
+                    next_think = clock + 0.015;
+                    for &(_, ref mut player) in players.iter_mut() {
+                        player.think()
+                    }
                 }
                 
                 let culled = server.cull();
