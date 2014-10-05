@@ -103,6 +103,10 @@ impl Player {
 
         new_distance_sq <= maximum_distance_sq && new_distance_sq < current_distance_sq
     }
+
+    pub fn freeze(&mut self, time: f64) {
+        self.unfreeze_time = time + 5.0;
+    }
 }
 
 impl fmt::Show for Player {

@@ -105,6 +105,8 @@ fn main() {
                     next_think = clock + 0.015;
                     //FIXME: There must be a better way of doing comparisons
                     let comparator_players = players.clone();
+                    let mut pass_on_tag = None;
+
                     for &(_, ref mut player) in players.iter_mut() {
                         if !player.is_frozen(clock) {
                             let mut collided = player.id;
@@ -118,8 +120,23 @@ fn main() {
                             }
                             if collided == player.id {
                                 player.think()
+                            } else if player.id == tagged_player {
+                                pass_on_tag = Some(collided)
                             }
                         }
+                    };
+
+                    match pass_on_tag {
+                        Some(id) => {
+                            for &(_, ref mut player) in players.iter_mut() {
+                                if player.id == id {
+                                    player.freeze(clock);
+                                    break;
+                                }
+                            };
+                            tagged_player = id;
+                        },
+                        None => ()
                     }
                 }
                 
