@@ -14,6 +14,7 @@ pub struct Player {
     pub id: u16,
     pub x: i32,
     pub y: i32,
+    pub unfreeze_time: f64,
     pub key_up: bool,
     pub key_down: bool,
     pub key_left: bool,
@@ -26,11 +27,16 @@ impl Player {
             id: id,
             x: x,
             y: y,
+            unfreeze_time: 0.0,
             key_up: false,
             key_down: false,
             key_left: false,
             key_right: false
         }
+    }
+
+    pub fn is_frozen(&self, time: f64) -> bool {
+        time < self.unfreeze_time
     }
 
     pub fn think(&mut self) {
@@ -65,10 +71,37 @@ impl Player {
         let id = try!(reader.read_be_u16());
         let x = try!(reader.read_be_i32());
         let y = try!(reader.read_be_i32());
+        let unfreeze_time = try!(reader.read_be_f64());
         let flags = try!(reader.read_u8());
         let mut player = Player::new(id, x, y);
         player.read_playerflags(flags);
+        player.unfreeze_time = unfreeze_time;
         Ok(player)
+    }
+
+    pub fn will_collide(&self, other: &Player) -> bool {
+        let current_distance_sq = ((self.x - other.x) * (self.x - other.x)) + ((self.y - other.y) * (self.y - other.y));
+
+        let new_x = if self.key_left {
+            self.x - 1
+        } else if self.key_right {
+            self.x + 1
+        } else {
+            self.x
+        };
+
+        let new_y = if self.key_up {
+            self.y - 1
+        } else if self.key_down {
+            self.y + 1
+        } else {
+            self.y
+        };
+        let new_distance_sq = ((new_x - other.x) * (new_x - other.x)) + ((new_y - other.y) * (new_y - other.y));
+
+        let maximum_distance_sq = 32 * 32i32;
+
+        new_distance_sq <= maximum_distance_sq && new_distance_sq < current_distance_sq
     }
 }
 
@@ -87,6 +120,7 @@ impl PacketSerialize for Player {
         w.write_be_u16(self.id).ok().expect(error_message);
         w.write_be_i32(self.x).ok().expect(error_message);
         w.write_be_i32(self.y).ok().expect(error_message);
+        w.write_be_f64(self.unfreeze_time).ok().expect(error_message);
         w.write_u8(self.make_playerflags()).ok().expect(error_message);
         w.unwrap()
     }

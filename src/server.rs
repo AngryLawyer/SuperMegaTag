@@ -103,20 +103,35 @@ fn main() {
                 //Update the game world
                 if clock >= next_think {
                     next_think = clock + 0.015;
+                    //FIXME: There must be a better way of doing comparisons
+                    let comparator_players = players.clone();
                     for &(_, ref mut player) in players.iter_mut() {
-                        player.think()
+                        if !player.is_frozen(clock) {
+                            let mut collided = player.id;
+                            for &(_, ref other_player) in comparator_players.iter() {
+                                if player.id != other_player.id {
+                                    if player.will_collide(other_player) {
+                                        collided = other_player.id;
+                                        break;
+                                    }
+                                }
+                            }
+                            if collided == player.id {
+                                player.think()
+                            }
+                        }
                     }
                 }
                 
                 let culled = server.cull();
                 if culled.len() > 0 {
                     println!("{} timed out", culled);
-                    players = players.into_iter().filter(|&(player, _)| culled.contains(&player) == false).collect()
+                    players = players.into_iter().filter(|&(player, _)| culled.contains(&player) == false).collect();
+                    tagged_player = update_tagged_player_validity(&mut rng, &players, tagged_player);
                 }
 
                 if clock >= next_broadcast {
                     next_broadcast = clock + broadcast_rate;
-                    println!("Heartbeat! {}", clock);
                     let serialized_state: Vec<player::Player> = players.iter().map(|&(_, data)| data).collect();
                     for &(ref user, ref data) in players.iter() {
                         server.send_to(&packet::FullServerState(data.id, tagged_player, serialized_state.clone()), user);

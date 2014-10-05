@@ -74,7 +74,10 @@ impl <'r> Scene for GameScene <'r> {
                             },
                             None => ()
                         };
-                        player.think()
+
+                        if (!player.is_frozen(self.clock)) {
+                            player.think()
+                        }
                     }
                 }
                 
