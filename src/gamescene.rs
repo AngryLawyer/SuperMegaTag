@@ -1,7 +1,7 @@
 use scene::{Scene, SceneManager};
 use gamestate::GameState;
 use piston::{graphics, Render, Event, Update, Input};
-use piston::graphics::{AddColor, Draw, AddEllipse, AddBorder};
+use piston::graphics::{AddColor, Draw, AddImage, RelativeTransform2d};
 use piston::input;
 use string_telephone::{Client, PollDisconnected};
 use packet;
@@ -120,25 +120,22 @@ impl <'r> Scene for GameScene <'r> {
                 }
             },
             &Render(args) => {
-                let gl = state.get_gl();
+                let (gl, player_tex, player_lit_tex, opponent_tex, opponent_lit_tex) = state.get_gl_and_assets();
 
                 gl.viewport(0, 0, args.width as i32, args.height as i32);
 
                 let c = &graphics::Context::abs(args.width as f64, args.height as f64);
-                c.rgb(1.0, 1.0, 1.0).draw(gl);
+                c.rgb(0.0, 0.0, 0.0).draw(gl);
 
                 for player in self.players.iter() {
-                    let c = match self.player_id {
-                        Some(id) => {
-                            if id == player.id {
-                                c.rgb(1.0, 0.0, 0.0)
-                            } else {
-                                c.rgb(0.0, 0.0, 0.0)
-                            }
+                    let c = c.trans((player.x - 16) as f64, (player.y - 16) as f64);
+                    match self.player_id {
+                        Some(id) if id == player.id => {
+                            c.image(player_tex).draw(gl)
                         },
-                        None => c.rgb(0.0, 0.0, 0.0)
+                        _ => c.image(opponent_tex).draw(gl)
                     };
-                    c.circle(player.x as f64, player.y as f64, 10.0).draw(gl);
+                    //c.circle(player.x as f64, player.y as f64, 10.0).draw(gl);
                 }
 
             },

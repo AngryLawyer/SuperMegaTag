@@ -1,26 +1,37 @@
-use conrod::{
-    UIContext,
-};
-
-use opengl_graphics::{
-    Gl
-};
+use conrod::UIContext;
+use opengl_graphics::{Gl, Texture};
 
 use string_telephone::{Client, PollFailResult, PollDisconnected};
 use packet;
+use piston::AssetStore;
 
 pub struct GameState {
     uic: UIContext,
     gl: Gl,
-    comms: Option<Client<packet::Packet>>
+    comms: Option<Client<packet::Packet>>,
+
+    player_tex: Texture,
+    player_lit_tex: Texture,
+    opponent_tex: Texture,
+    opponent_lit_tex: Texture
+}
+
+pub fn load_texture(asset_store: &AssetStore, path: &str) -> Texture {
+    let image = asset_store.path(path).unwrap();
+    Texture::from_path(&image).unwrap()
 }
 
 impl GameState {
-    pub fn new(uic: UIContext, gl: Gl) -> GameState {
+    pub fn new(uic: UIContext, gl: Gl, asset_store: &AssetStore) -> GameState {
+
         GameState {
             uic: uic,
             gl: gl,
-            comms: None
+            comms: None,
+            player_tex: load_texture(asset_store, "player.png"),
+            player_lit_tex: load_texture(asset_store, "player-lit.png"),
+            opponent_tex: load_texture(asset_store, "opponent.png"),
+            opponent_lit_tex: load_texture(asset_store, "opponent-lit.png"),
         }
     }
 
@@ -49,5 +60,9 @@ impl GameState {
 
     pub fn get_gl(&mut self) -> &mut Gl {
         &mut self.gl
+    }
+
+    pub fn get_gl_and_assets(&mut self) -> (&mut Gl, &Texture, &Texture, &Texture, &Texture) {
+        (&mut self.gl, &self.player_tex, &self.player_lit_tex, &self.opponent_tex, &self.opponent_lit_tex)
     }
 }
