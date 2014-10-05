@@ -6,24 +6,30 @@ pub trait PacketSerialize {
 }
 
 pub enum Packet {
-    FullServerState(u16, Vec<Player>),
+    FullServerState(u16, u16, Vec<Player>),
     MovePacket(bool, bool, bool, bool)
 }
 
 pub fn deserializer(message: &Vec<u8>) -> Option<Packet> {
     let mut r = MemReader::new(message.clone());
+
     match r.read_u8() {
         Ok(0) => {
             match r.read_be_u16() {
                 Ok(player_id) => {
-                    let mut result = vec![];
-                    while r.eof() == false {
-                        match Player::deserialize(&mut r) {
-                            Ok(player) => result.push(player),
-                            Err(_) => break
-                        }
+                    match r.read_be_u16() {
+                        Ok(tagged_id) => {
+                            let mut result = vec![];
+                            while r.eof() == false {
+                                match Player::deserialize(&mut r) {
+                                    Ok(player) => result.push(player),
+                                    Err(_) => break
+                                }
+                            }
+                            Some(FullServerState(player_id, tagged_id, result))
+                        },
+                        Err(_) => None
                     }
-                    Some(FullServerState(player_id, result))
                 },
                 Err(_) => None
             }
@@ -48,9 +54,10 @@ pub fn deserializer(message: &Vec<u8>) -> Option<Packet> {
 pub fn serializer(packet: &Packet) -> Vec<u8> {
     let mut w = MemWriter::new();
     match packet {
-        &FullServerState(player_id, ref players) => {
+        &FullServerState(player_id, tagged_id, ref players) => {
             w.write_u8(0);
             w.write_be_u16(player_id);
+            w.write_be_u16(tagged_id);
             for &player in players.iter() {
                 w.write(player.serialize().as_slice());
             }

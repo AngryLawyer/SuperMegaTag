@@ -6,10 +6,25 @@ use std::io::net::ip::{Ipv4Addr, SocketAddr};
 use piston::{EventIterator, EventSettings, WindowSettings, NoWindow};
 use string_telephone::{Server, ConnectionConfig, UserPacket, Command, PacketDisconnect, PacketConnect};
 use std::rand;
-use std::rand::Rng;
+use std::rand::{Rng, TaskRng};
 
 pub mod packet;
 pub mod player;
+
+fn update_tagged_player_validity(rng: &mut TaskRng, players: &Vec<(SocketAddr, player::Player)>, current_tagged: u16) -> u16 {
+    if players.len() == 0 {
+        current_tagged
+    } else {
+        let tagged_count = players.iter().filter(|&&(_, player)| &player.id == &current_tagged).count();
+        if tagged_count == 0 {
+            let index = (rng.gen::<uint>() % players.len());
+            let (_, player) = players[index];
+            player.id
+        } else {
+            current_tagged
+        }
+    }
+}
 
 fn main() {
     let mut window = NoWindow::new(WindowSettings {
@@ -49,6 +64,7 @@ fn main() {
     let mut clock = 0f64;
     //let clock_rate = 0.0015;
     let broadcast_rate = 1.0 / 20.0;
+    let mut tagged_player = 0;
 
     for e in EventIterator::new(&mut window, &game_iter_settings) {
         match e {
@@ -60,11 +76,13 @@ fn main() {
                             println!("{} connected", addr_from);
                             //TODO: Check this player doesn't already exist
                             players.push((addr_from, player::Player::new(player_counter, (rng.gen::<u32>() % 800) as i32, (rng.gen::<u32>() % 600) as i32)));
+                            tagged_player = update_tagged_player_validity(&mut rng, &players, tagged_player);
                             player_counter += 1;
                         },
                         Some((Command(PacketDisconnect), addr_from)) => {
                             println!("{} disconnected", addr_from);
-                            players = players.into_iter().filter(|&(controller, _)| &controller != &addr_from).collect()
+                            players = players.into_iter().filter(|&(controller, _)| &controller != &addr_from).collect();
+                            tagged_player = update_tagged_player_validity(&mut rng, &players, tagged_player);
                         },
                         Some((UserPacket(packet::MovePacket(up, down, left, right)), addr_from)) => {
                             for &(controller, ref mut player) in players.iter_mut() {
@@ -76,8 +94,6 @@ fn main() {
                                     break;
                                 }
                             };
-                            //TODO: Respond to movement events
-                            //Do something
                         },
                         Some(_) => (),
                         None => break
@@ -103,7 +119,7 @@ fn main() {
                     println!("Heartbeat! {}", clock);
                     let serialized_state: Vec<player::Player> = players.iter().map(|&(_, data)| data).collect();
                     for &(ref user, ref data) in players.iter() {
-                        server.send_to(&packet::FullServerState(data.id, serialized_state.clone()), user);
+                        server.send_to(&packet::FullServerState(data.id, tagged_player, serialized_state.clone()), user);
                     }
                 }
             },

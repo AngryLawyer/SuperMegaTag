@@ -6,8 +6,7 @@ pub enum PlayerFlags {
     UP = 0x0001,
     DOWN = 0x0002,
     LEFT = 0x0004,
-    RIGHT = 0x0008,
-    TAGGED = 0x0010
+    RIGHT = 0x0008
 }
 
 #[deriving(Clone)]
@@ -19,7 +18,6 @@ pub struct Player {
     pub key_down: bool,
     pub key_left: bool,
     pub key_right: bool,
-    pub is_tagged: bool
 }
 
 impl Player {
@@ -31,8 +29,7 @@ impl Player {
             key_up: false,
             key_down: false,
             key_left: false,
-            key_right: false,
-            is_tagged: false
+            key_right: false
         }
     }
 
@@ -54,8 +51,7 @@ impl Player {
         (if self.key_up { UP as u8 } else { 0 }) |
         (if self.key_down { DOWN as u8 } else { 0 }) |
         (if self.key_left { LEFT as u8 } else { 0 }) |
-        (if self.key_right { RIGHT as u8 } else { 0 }) |
-        (if self.is_tagged { TAGGED as u8 } else { 0 }) 
+        (if self.key_right { RIGHT as u8 } else { 0 }) 
     }
 
     pub fn read_playerflags(&mut self, flags: u8) {
@@ -63,7 +59,6 @@ impl Player {
         self.key_down = flags & DOWN as u8 > 0;
         self.key_left = flags & LEFT as u8 > 0;
         self.key_right = flags & RIGHT as u8 > 0;
-        self.is_tagged = flags & TAGGED as u8 > 0;
     }
 
     pub fn deserialize(reader: &mut MemReader) -> Result<Player, IoError> {

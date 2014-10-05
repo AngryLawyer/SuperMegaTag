@@ -14,6 +14,7 @@ pub struct GameScene<'r> {
     next_broadcast: f64,
     next_think: f64,
     player_id: Option<u16>,
+    tagged_id: u16,
     up: bool,
     down: bool,
     left: bool,
@@ -30,6 +31,7 @@ impl <'r> GameScene<'r> {
            next_broadcast: 0.0,
            next_think: 0.0,
            player_id: None,
+           tagged_id: 0,
            players: vec![],
            up: false,
            down: false,
@@ -46,8 +48,9 @@ impl <'r> Scene for GameScene <'r> {
             &Update(args) => {
                 self.clock += args.dt;
                 match state.poll_comms() {
-                    Ok(packet::FullServerState(player_id, players)) => {
+                    Ok(packet::FullServerState(player_id, tagged_id, players)) => {
                         self.player_id = Some(player_id);
+                        self.tagged_id = tagged_id;
                         self.players = players;
                     },
                     Ok(_) => (),
@@ -131,11 +134,20 @@ impl <'r> Scene for GameScene <'r> {
                     let c = c.trans((player.x - 16) as f64, (player.y - 16) as f64);
                     match self.player_id {
                         Some(id) if id == player.id => {
-                            c.image(player_tex).draw(gl)
+                            if player.id == self.tagged_id {
+                                c.image(player_lit_tex).draw(gl)
+                            } else {
+                                c.image(player_tex).draw(gl)
+                            }
                         },
-                        _ => c.image(opponent_tex).draw(gl)
+                        _ => {
+                            if player.id == self.tagged_id {
+                                c.image(opponent_lit_tex).draw(gl)
+                            } else {
+                                c.image(opponent_tex).draw(gl)
+                            }
+                        }
                     };
-                    //c.circle(player.x as f64, player.y as f64, 10.0).draw(gl);
                 }
 
             },
