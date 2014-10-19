@@ -9,7 +9,7 @@ extern crate opengl_graphics;
 extern crate sdl2_game_window;
 
 use opengl_graphics::Gl;
-use conrod::UIContext;
+use conrod::UiContext;
 
 use piston::{EventIterator, EventSettings, WindowSettings, AssetStore};
 use string_telephone::ConnectionConfig;
@@ -42,7 +42,7 @@ fn main() {
     };
 
     let mut manager = scene::SceneManager::new();
-    let mut gamestate = gamestate::GameState::new(UIContext::new("Dense-Regular.otf"), Gl::new(opengl), &AssetStore::from_folder("../assets"));
+    let mut gamestate = gamestate::GameState::new(UiContext::new("Dense-Regular.otf", None), Gl::new(opengl), &AssetStore::from_folder("../assets"));
     manager.set_scene(|manager| { box connectscene::ConnectScene::new(manager) });
 
     for ref e in EventIterator::new(&mut window, &event_settings) {

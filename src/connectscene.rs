@@ -1,5 +1,6 @@
 use std::io::net::ip::{SocketAddr, Ipv4Addr};
-use string_telephone::{Client, ConnectionConfig};
+use std::time::duration::Duration;
+use string_telephone::{Client, ConnectionConfig, ClientConnectionConfig};
 use scene::{Scene, SceneManager};
 use gamescene::GameScene;
 use gamestate::GameState;
@@ -88,7 +89,7 @@ impl <'r> Scene for ConnectScene <'r> {
                 label::draw(
                     gl,
                     uic,
-                    Point::new(0f64, 0f64, 0f64), // Screen position.
+                    [0f64, 0f64], // Screen position.
                     48u32, // Font size.
                     Color::new(1.0, 0.0, 0.0, 1.0),
                     "Select a server"
@@ -97,13 +98,13 @@ impl <'r> Scene for ConnectScene <'r> {
                 uic.widget_matrix(4, 1)
                     .position(0.0, 56.0)
                     .dimensions(300.0, 240.0)
-                    .each_widget(|uic, num, _, _, pos, width, _| {
+                    .each_widget(|uic, num, _, _, pos, dims| {
                         // Now draw the widgets with the given callback.
                         uic.text_box(2 + num as u64, self.edit_ip.get_mut(num))
                             .font_size(24u32)
-                            .dimensions(width, 36.0)
-                            .position(pos.x, pos.y)
-                            .frame(2.0, Color::black())
+                            .dimensions(dims[0], 36.0)
+                            .position(pos[0], pos[1])
+                            .frame(2.0)
                             .color(Color::black())
                             .draw(gl);
 
@@ -113,8 +114,8 @@ impl <'r> Scene for ConnectScene <'r> {
                     .dimensions(90.0, 36.0)
                     .position(0.0, 128.0)
                     .color(Color::black())
-                    .frame(2.0, Color::black())
-                    .label("Connect", 24u32, Color::white())
+                    .frame(2.0)
+                    .label("Connect")
                     .callback(|| {
                         if self.is_connecting() == false {
                             let parsed = (from_str(self.edit_ip[0].as_slice()), from_str(self.edit_ip[1].as_slice()), from_str(self.edit_ip[2].as_slice()), from_str(self.edit_ip[3].as_slice()));
@@ -126,13 +127,15 @@ impl <'r> Scene for ConnectScene <'r> {
                                     spawn(proc() {
                                         let settings = ConnectionConfig {
                                             protocol_id: 88869,
-                                            timeout_period: 10,
+                                            timeout_period: Duration::seconds(10),
                                             packet_deserializer: packet::deserializer,
                                             packet_serializer: packet::serializer
                                         };
 
+                                        let client_settings = ClientConnectionConfig::new(3, Duration::seconds(5));
+
                                         println!("Connecting");
-                                        match Client::connect(SocketAddr {ip: Ipv4Addr(0, 0, 0, 0), port: 0}, SocketAddr {ip: Ipv4Addr(a, b, c, d), port: 8869}, settings) {
+                                        match Client::connect(SocketAddr {ip: Ipv4Addr(0, 0, 0, 0), port: 0}, SocketAddr {ip: Ipv4Addr(a, b, c, d), port: 8869}, settings, client_settings) {
                                             Ok(client) => {
                                                 tx.send(Some(client))
                                             },

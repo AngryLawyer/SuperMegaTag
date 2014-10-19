@@ -7,6 +7,7 @@ use piston::{EventIterator, EventSettings, WindowSettings, NoWindow};
 use string_telephone::{Server, ConnectionConfig, UserPacket, Command, PacketDisconnect, PacketConnect};
 use std::rand;
 use std::rand::{Rng, TaskRng};
+use std::time::duration::Duration;
 
 pub mod packet;
 pub mod player;
@@ -42,7 +43,7 @@ fn main() {
 
     let settings = ConnectionConfig {
         protocol_id: 88869,
-        timeout_period: 10,
+        timeout_period: Duration::seconds(10),
         packet_deserializer: packet::deserializer,
         packet_serializer: packet::serializer
     };

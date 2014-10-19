@@ -1,4 +1,4 @@
-use conrod::UIContext;
+use conrod::UiContext;
 use opengl_graphics::{Gl, Texture};
 
 use string_telephone::{Client, PollFailResult, PollDisconnected};
@@ -6,7 +6,7 @@ use packet;
 use piston::AssetStore;
 
 pub struct GameState {
-    uic: UIContext,
+    uic: UiContext,
     gl: Gl,
     comms: Option<Client<packet::Packet>>,
 
@@ -22,7 +22,7 @@ pub fn load_texture(asset_store: &AssetStore, path: &str) -> Texture {
 }
 
 impl GameState {
-    pub fn new(uic: UIContext, gl: Gl, asset_store: &AssetStore) -> GameState {
+    pub fn new(uic: UiContext, gl: Gl, asset_store: &AssetStore) -> GameState {
 
         GameState {
             uic: uic,
@@ -50,11 +50,11 @@ impl GameState {
         &mut self.comms
     }
 
-    pub fn get_drawables(&mut self) -> (&mut UIContext, &mut Gl) {
+    pub fn get_drawables(&mut self) -> (&mut UiContext, &mut Gl) {
         (&mut self.uic, &mut self.gl)
     }
 
-    pub fn get_uic(&mut self) -> &mut UIContext {
+    pub fn get_uic(&mut self) -> &mut UiContext {
         &mut self.uic
     }
 
