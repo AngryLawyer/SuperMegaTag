@@ -115,17 +115,17 @@ impl fmt::Show for Player {
     }
 }
 
-static error_message: &'static str = "Failed to write to PacketSerialize";
+static ERROR_MESSAGE: &'static str = "Failed to serialize player";
 
 impl PacketSerialize for Player {
 
     fn serialize(&self) -> Vec<u8> {
         let mut w = MemWriter::new();
-        w.write_be_u16(self.id).ok().expect(error_message);
-        w.write_be_i32(self.x).ok().expect(error_message);
-        w.write_be_i32(self.y).ok().expect(error_message);
-        w.write_be_f64(self.unfreeze_time).ok().expect(error_message);
-        w.write_u8(self.make_playerflags()).ok().expect(error_message);
+        w.write_be_u16(self.id).ok().expect(ERROR_MESSAGE);
+        w.write_be_i32(self.x).ok().expect(ERROR_MESSAGE);
+        w.write_be_i32(self.y).ok().expect(ERROR_MESSAGE);
+        w.write_be_f64(self.unfreeze_time).ok().expect(ERROR_MESSAGE);
+        w.write_u8(self.make_playerflags()).ok().expect(ERROR_MESSAGE);
         w.unwrap()
     }
 }

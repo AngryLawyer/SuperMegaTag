@@ -12,7 +12,6 @@ use opengl_graphics::Gl;
 use conrod::UiContext;
 
 use piston::{EventIterator, EventSettings, WindowSettings, AssetStore};
-use string_telephone::ConnectionConfig;
 use sdl2_game_window::WindowSDL2;
 
 pub mod scene;

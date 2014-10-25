@@ -1,13 +1,12 @@
 use std::io::net::ip::{SocketAddr, Ipv4Addr};
 use std::time::duration::Duration;
 use string_telephone::{Client, ConnectionConfig, ClientConnectionConfig};
-use scene::Scene;
+use scene::{Scene,BoxedScene};
 use gamescene::GameScene;
 use gamestate::GameState;
 use conrod::{
     label,
     Color,
-    Point,
     WidgetMatrix,
     Button,
     Callable,
@@ -36,7 +35,7 @@ pub struct ConnectScene {
 
 impl ConnectScene {
 
-    pub fn new() -> Box<Scene + 'static> {
+    pub fn new() -> BoxedScene {
        box ConnectScene {
            edit_ip: vec!["127".to_string(), "0".to_string(), "0".to_string(), "1".to_string()],
            try_connect: Disconnected
@@ -50,9 +49,9 @@ impl ConnectScene {
 }
 
 impl Scene for ConnectScene {
-    fn handle_event(&mut self, e: &Event, state: &mut GameState) -> Option<Box<Scene + 'static>> {
+    fn handle_event(&mut self, e: &Event, state: &mut GameState) -> Option<BoxedScene> {
         match e {
-            &Update(args) => {
+            &Update(_) => {
                 let mut maybe_scene = None;
                 let should_disconnect = match self.try_connect {
                     Connecting(ref socket) => {
@@ -139,7 +138,7 @@ impl Scene for ConnectScene {
                                             Ok(client) => {
                                                 tx.send(Some(client))
                                             },
-                                            Err(e) => tx.send(None)
+                                            Err(_) => tx.send(None)
                                         };
                                     });
                                 },

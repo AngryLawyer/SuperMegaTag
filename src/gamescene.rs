@@ -1,9 +1,9 @@
-use scene::Scene;
+use scene::{Scene, BoxedScene};
 use gamestate::GameState;
 use piston::{graphics, Render, Event, Update, Input};
 use piston::graphics::{AddColor, Draw, AddImage, RelativeTransform2d};
 use piston::input;
-use string_telephone::{Client, PollDisconnected};
+use string_telephone::PollDisconnected;
 use packet;
 use player::Player;
 use connectscene::ConnectScene;
@@ -22,7 +22,7 @@ pub struct GameScene {
 }
 
 impl GameScene {
-    pub fn new() -> Box<Scene + 'static> {
+    pub fn new() -> BoxedScene {
        box GameScene {
            clock: 0.0,
            next_broadcast: 0.0,
@@ -41,7 +41,7 @@ impl GameScene {
 
 impl Scene for GameScene {
 
-    fn handle_event(&mut self, e: &Event, state: &mut GameState) -> Option<Box<Scene + 'static>> {
+    fn handle_event(&mut self, e: &Event, state: &mut GameState) -> Option<BoxedScene> {
         match e {
             &Update(args) => {
                 let mut maybe_scene = None;
@@ -74,7 +74,7 @@ impl Scene for GameScene {
                             None => ()
                         };
 
-                        if (!player.is_frozen(self.clock)) {
+                        if !player.is_frozen(self.clock) {
                             player.think()
                         }
                     }

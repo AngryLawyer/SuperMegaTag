@@ -18,7 +18,7 @@ fn update_tagged_player_validity(rng: &mut TaskRng, players: &Vec<(SocketAddr, p
     } else {
         let tagged_count = players.iter().filter(|&&(_, player)| &player.id == &current_tagged).count();
         if tagged_count == 0 {
-            let index = (rng.gen::<uint>() % players.len());
+            let index = rng.gen::<uint>() % players.len();
             let (_, player) = players[index];
             player.id
         } else {
