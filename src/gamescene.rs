@@ -1,4 +1,4 @@
-use scene::{Scene, SceneManager};
+use scene::Scene;
 use gamestate::GameState;
 use piston::{graphics, Render, Event, Update, Input};
 use piston::graphics::{AddColor, Draw, AddImage, RelativeTransform2d};
@@ -8,8 +8,7 @@ use packet;
 use player::Player;
 use connectscene::ConnectScene;
 
-pub struct GameScene<'r> {
-    manager: &'r mut SceneManager,
+pub struct GameScene {
     clock: f64,
     next_broadcast: f64,
     next_think: f64,
@@ -22,11 +21,9 @@ pub struct GameScene<'r> {
     players: Vec<Player>,
 }
 
-impl <'r> GameScene<'r> {
-
-    pub fn new<'r>(manager: &'r mut SceneManager) -> GameScene<'r> {
-       GameScene {
-           manager: manager,
+impl GameScene {
+    pub fn new() -> Box<Scene + 'static> {
+       box GameScene {
            clock: 0.0,
            next_broadcast: 0.0,
            next_think: 0.0,
@@ -39,13 +36,15 @@ impl <'r> GameScene<'r> {
            right: false
        }
     }
-}
-//let clock_rate = 0.0015;
 
-impl <'r> Scene for GameScene <'r> {
-    fn handle_event(&mut self, e: &Event, state: &mut GameState) {
+}
+
+impl Scene for GameScene {
+
+    fn handle_event(&mut self, e: &Event, state: &mut GameState) -> Option<Box<Scene + 'static>> {
         match e {
             &Update(args) => {
+                let mut maybe_scene = None;
                 self.clock += args.dt;
                 match state.poll_comms() {
                     Ok(packet::FullServerState(player_id, tagged_id, players)) => {
@@ -55,7 +54,7 @@ impl <'r> Scene for GameScene <'r> {
                     },
                     Ok(_) => (),
                     Err(PollDisconnected) => {
-                        self.manager.set_scene(|manager| box ConnectScene::new(manager));
+                        maybe_scene = Some(ConnectScene::new());
                     }
                     Err(_) => ()
                 }
@@ -90,6 +89,7 @@ impl <'r> Scene for GameScene <'r> {
                         &None => ()
                     }
                 }
+                maybe_scene
             },
             &Input(input::Press(input::Keyboard(key))) => {
                 match key {
@@ -106,7 +106,8 @@ impl <'r> Scene for GameScene <'r> {
                         self.right = true;
                     },
                     _ => ()
-                }
+                };
+                None
             },
             &Input(input::Release(input::Keyboard(key))) => {
                 match key {
@@ -123,7 +124,8 @@ impl <'r> Scene for GameScene <'r> {
                         self.right = false;
                     },
                     _ => ()
-                }
+                };
+                None
             },
             &Render(args) => {
                 let (gl, player_tex, player_lit_tex, opponent_tex, opponent_lit_tex) = state.get_gl_and_assets();
@@ -151,10 +153,10 @@ impl <'r> Scene for GameScene <'r> {
                             }
                         }
                     };
-                }
-
+                };
+                None
             },
-            _ => ()
+            _ => None
         }
     }
 }

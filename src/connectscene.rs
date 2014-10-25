@@ -1,7 +1,7 @@
 use std::io::net::ip::{SocketAddr, Ipv4Addr};
 use std::time::duration::Duration;
 use string_telephone::{Client, ConnectionConfig, ClientConnectionConfig};
-use scene::{Scene, SceneManager};
+use scene::Scene;
 use gamescene::GameScene;
 use gamestate::GameState;
 use conrod::{
@@ -29,37 +29,37 @@ enum ConnectState {
     Connecting(Receiver<Option<Client<packet::Packet>>>)
 }
 
-pub struct ConnectScene<'r> {
-    manager: &'r mut SceneManager,
+pub struct ConnectScene {
     pub edit_ip: Vec<String>,
     try_connect: ConnectState,
 }
 
-impl <'r> ConnectScene<'r> {
+impl ConnectScene {
 
-    pub fn new<'r>(manager: &'r mut SceneManager) -> ConnectScene<'r> {
-       ConnectScene {
-           manager: manager,
+    pub fn new() -> Box<Scene + 'static> {
+       box ConnectScene {
            edit_ip: vec!["127".to_string(), "0".to_string(), "0".to_string(), "1".to_string()],
            try_connect: Disconnected
        }
     }
+    
 
     pub fn is_connecting(&self) -> bool {
         match self.try_connect { Disconnected => false, _ => true}
     }
 }
 
-impl <'r> Scene for ConnectScene <'r> {
-    fn handle_event(&mut self, e: &Event, state: &mut GameState) {
+impl Scene for ConnectScene {
+    fn handle_event(&mut self, e: &Event, state: &mut GameState) -> Option<Box<Scene + 'static>> {
         match e {
             &Update(args) => {
+                let mut maybe_scene = None;
                 let should_disconnect = match self.try_connect {
                     Connecting(ref socket) => {
                         match socket.try_recv() {
                             Ok(Some(comms)) => {
                                 println!("Connected");
-                                self.manager.set_scene(|manager| box GameScene::new(manager));
+                                maybe_scene = Some(GameScene::new());
                                 state.set_comms(comms);
                                 true
                             },
@@ -75,7 +75,7 @@ impl <'r> Scene for ConnectScene <'r> {
                 if should_disconnect {
                     self.try_connect = Disconnected;
                 }
-
+                maybe_scene
             },
             &Render(args) => {
                 let (uic, gl) = state.get_drawables();
@@ -148,9 +148,9 @@ impl <'r> Scene for ConnectScene <'r> {
                         }
                     })
                     .draw(gl);
-
+                None
             },
-            _ => {},
+            _ => None,
         }
     }
 }

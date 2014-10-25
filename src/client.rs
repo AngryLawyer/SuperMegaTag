@@ -41,12 +41,14 @@ fn main() {
         max_frames_per_second: 60,
     };
 
-    let mut manager = scene::SceneManager::new();
     let mut gamestate = gamestate::GameState::new(UiContext::new("Dense-Regular.otf", None), Gl::new(opengl), &AssetStore::from_folder("../assets"));
-    manager.set_scene(|manager| { box connectscene::ConnectScene::new(manager) });
+    let mut current_scene = connectscene::ConnectScene::new();
 
     for ref e in EventIterator::new(&mut window, &event_settings) {
         gamestate.get_uic().handle_event(e);
-        manager.handle_event(e, &mut gamestate);
+        match current_scene.handle_event(e, &mut gamestate) {
+            Some(scene) => current_scene = scene,
+            None => ()
+        };
     }
 }
