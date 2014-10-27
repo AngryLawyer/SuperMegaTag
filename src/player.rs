@@ -79,8 +79,12 @@ impl Player {
         Ok(player)
     }
 
+    pub fn distance_sq(&self, other: &Player) -> i32 {
+        ((self.x - other.x) * (self.x - other.x)) + ((self.y - other.y) * (self.y - other.y))
+    }
+
     pub fn will_collide(&self, other: &Player) -> bool {
-        let current_distance_sq = ((self.x - other.x) * (self.x - other.x)) + ((self.y - other.y) * (self.y - other.y));
+        let current_distance_sq = self.distance_sq(other);
 
         let new_x = if self.key_left {
             self.x - 1

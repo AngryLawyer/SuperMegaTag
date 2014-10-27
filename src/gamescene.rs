@@ -8,6 +8,8 @@ use packet;
 use player::Player;
 use connectscene::ConnectScene;
 
+const MAX_FUZZY_DISTANCE: i32 = 8 * 8;
+
 pub struct GameScene {
     clock: f64,
     next_broadcast: f64,
@@ -37,6 +39,34 @@ impl GameScene {
        }
     }
 
+    fn stitch_players(&mut self, mut new_players: Vec<Player>) {
+        //We need to unify our current player position, for prediction
+        match self.player_id {
+            Some(id) => {
+                {
+                    let maybe_old_self = self.players.iter_mut().find(|player| { player.id == id });
+                    let maybe_new_self = new_players.iter_mut().find(|player| { player.id == id });
+                    match (maybe_old_self, maybe_new_self) {
+                        (Some(old), Some(new)) => {
+                            new.key_up = old.key_up;
+                            new.key_down = old.key_down;
+                            new.key_left = old.key_left;
+                            new.key_right = old.key_right;
+
+                            //How different do our positions need to be before we wipe prediction?
+                            if old.distance_sq(new) > MAX_FUZZY_DISTANCE {
+                                new.x = old.x;
+                                new.y = old.y;
+                            }
+                        }
+                        _ => ()
+                    }
+                }
+                self.players = new_players;
+            },
+            None => {self.players = new_players;}
+        }
+    }
 }
 
 impl Scene for GameScene {
@@ -50,7 +80,7 @@ impl Scene for GameScene {
                     Ok(packet::FullServerState(player_id, tagged_id, players)) => {
                         self.player_id = Some(player_id);
                         self.tagged_id = tagged_id;
-                        self.players = players;
+                        self.stitch_players(players);
                     },
                     Ok(_) => (),
                     Err(PollDisconnected) => {
@@ -61,7 +91,7 @@ impl Scene for GameScene {
                 
                 if self.clock >= self.next_think {
                     self.next_think = self.clock + 0.015;
-                    for &mut player in self.players.iter_mut() {
+                    for player in self.players.iter_mut() {
                         match self.player_id {
                             Some(player_id) => {
                                 if player.id == player_id {
