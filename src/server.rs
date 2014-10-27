@@ -74,11 +74,17 @@ fn main() {
                 loop {
                     match server.poll() {
                         Some((Command(PacketConnect), addr_from)) => {
-                            println!("{} connected", addr_from);
-                            //TODO: Check this player doesn't already exist
-                            players.push((addr_from, player::Player::new(player_counter, (rng.gen::<u32>() % 800) as i32, (rng.gen::<u32>() % 600) as i32)));
-                            tagged_player = update_tagged_player_validity(&mut rng, &players, tagged_player);
-                            player_counter += 1;
+                            match players.iter().find(|&&(socket, _)|{ socket == addr_from}) {
+                                Some(_) => {
+                                    println!("{} tried to connect a second time", addr_from);
+                                },
+                                None => {
+                                    println!("{} connected", addr_from);
+                                    players.push((addr_from, player::Player::new(player_counter, (rng.gen::<u32>() % 800) as i32, (rng.gen::<u32>() % 600) as i32)));
+                                    tagged_player = update_tagged_player_validity(&mut rng, &players, tagged_player);
+                                    player_counter += 1;
+                                }
+                            }
                         },
                         Some((Command(PacketDisconnect), addr_from)) => {
                             println!("{} disconnected", addr_from);
