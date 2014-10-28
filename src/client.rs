@@ -6,13 +6,13 @@ extern crate piston;
 extern crate collections;
 extern crate string_telephone;
 extern crate opengl_graphics;
-extern crate sdl2_game_window;
+extern crate sdl2_window;
 
 use opengl_graphics::Gl;
 use conrod::UiContext;
 
 use piston::{EventIterator, EventSettings, WindowSettings, AssetStore};
-use sdl2_game_window::WindowSDL2;
+use sdl2_window::Sdl2Window;
 
 pub mod scene;
 pub mod connectscene;
@@ -24,7 +24,7 @@ pub mod player;
 fn main() {
 
     let opengl = piston::shader_version::opengl::OpenGL_3_2;
-    let mut window = WindowSDL2::new(
+    let mut window = Sdl2Window::new(
         opengl,
         WindowSettings {
             title: "SuperMegaTag".to_string(),
