@@ -14,17 +14,17 @@ path = "src/client.rs"
 name = "supermegatag_server"
 path = "src/server.rs"
 
-[dependencies.graphics]
-git = "https://github.com/pistondevelopers/rust-graphics"
-
-[dependencies.piston]
-git = "https://github.com/pistondevelopers/piston/"
+[dependencies.event]
+git = "https://github.com/pistondevelopers/event"
 
 [dependencies.sdl2_window]
 git = "https://github.com/pistondevelopers/sdl2_window"
 
 [dependencies.opengl_graphics]
 git = "https://github.com/pistondevelopers/opengl_graphics"
+
+[dependencies.graphics]
+git = "https://github.com/pistondevelopers/graphics"
 
 [dependencies.string_telephone]
 git = "https://github.com/AngryLawyer/string-telephone.git"

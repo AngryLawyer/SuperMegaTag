@@ -1,9 +1,9 @@
-extern crate piston;
+extern crate event;
 extern crate string_telephone;
 extern crate collections;
 
 use std::io::net::ip::{Ipv4Addr, SocketAddr};
-use piston::{EventIterator, EventSettings, WindowSettings, NoWindow};
+use event::{EventIterator, EventSettings, WindowSettings, NoWindow, Update};
 use string_telephone::{Server, ConnectionConfig, UserPacket, Command, PacketDisconnect, PacketConnect};
 use std::rand;
 use std::rand::{Rng, TaskRng};
@@ -53,7 +53,7 @@ fn main() {
             println!("Listening on {}", server.addr);
             server
         },
-        Err(e) => fail!("Failed to start listening - {}", e)
+        Err(e) => panic!("Failed to start listening - {}", e)
     };
 
     let mut players:Vec<(SocketAddr, player::Player)> = vec![];
@@ -69,7 +69,7 @@ fn main() {
 
     for e in EventIterator::new(&mut window, &game_iter_settings) {
         match e {
-            piston::Update(update_args) => {
+            Update(update_args) => {
                 clock += update_args.dt;
                 loop {
                     match server.poll() {

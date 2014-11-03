@@ -1,8 +1,8 @@
 use scene::{Scene, BoxedScene};
 use gamestate::GameState;
-use piston::{graphics, Render, Event, Update, Input};
-use piston::graphics::{AddColor, Draw, AddImage, RelativeTransform2d};
-use piston::input;
+use event::{Render, Event, Update, Input};
+use graphics::Context;
+use input;
 use string_telephone::PollDisconnected;
 use packet;
 use player::Player;
@@ -162,7 +162,7 @@ impl Scene for GameScene {
 
                 gl.viewport(0, 0, args.width as i32, args.height as i32);
 
-                let c = &graphics::Context::abs(args.width as f64, args.height as f64);
+                let c = &Context::abs(args.width as f64, args.height as f64);
                 c.rgb(0.0, 0.0, 0.0).draw(gl);
 
                 for player in self.players.iter() {

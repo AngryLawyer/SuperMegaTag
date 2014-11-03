@@ -3,7 +3,6 @@ use opengl_graphics::{Gl, Texture};
 
 use string_telephone::{Client, PollFailResult, PollDisconnected};
 use packet;
-use piston::AssetStore;
 
 pub struct GameState {
     uic: UiContext,
@@ -16,22 +15,22 @@ pub struct GameState {
     opponent_lit_tex: Texture
 }
 
-pub fn load_texture(asset_store: &AssetStore, path: &str) -> Texture {
-    let image = asset_store.path(path).unwrap();
+pub fn load_texture(asset_dir: &Path, path: &Path) -> Texture {
+    let image = asset_dir.join(path).unwrap();
     Texture::from_path(&image).unwrap()
 }
 
 impl GameState {
-    pub fn new(uic: UiContext, gl: Gl, asset_store: &AssetStore) -> GameState {
+    pub fn new(uic: UiContext, gl: Gl, asset_dir: &Path) -> GameState {
 
         GameState {
             uic: uic,
             gl: gl,
             comms: None,
-            player_tex: load_texture(asset_store, "player.png"),
-            player_lit_tex: load_texture(asset_store, "player-lit.png"),
-            opponent_tex: load_texture(asset_store, "opponent.png"),
-            opponent_lit_tex: load_texture(asset_store, "opponent-lit.png"),
+            player_tex: load_texture(asset_dir, Path::new("player.png")),
+            player_lit_tex: load_texture(asset_dir, Path::new("player-lit.png")),
+            opponent_tex: load_texture(asset_dir, Path::new("opponent.png")),
+            opponent_lit_tex: load_texture(asset_dir, Path::new("opponent-lit.png")),
         }
     }
 

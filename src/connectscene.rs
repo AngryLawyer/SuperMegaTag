@@ -5,6 +5,7 @@ use string_telephone::{Client, ConnectionConfig, ClientConnectionConfig};
 use scene::{Scene,BoxedScene};
 use gamescene::GameScene;
 use gamestate::GameState;
+use graphics::Context;
 use conrod::{
     Label,
     Color,
@@ -20,8 +21,7 @@ use conrod::{
     TextBox,
 };
 
-use piston::{graphics, Render, Event, Update};
-use piston::graphics::{AddColor, Draw};
+use event::{Render, Event, Update};
 use packet;
 
 enum ConnectState {
@@ -85,7 +85,7 @@ impl Scene for ConnectScene {
 
                 gl.viewport(0, 0, args.width as i32, args.height as i32);
 
-                let c = &graphics::Context::abs(args.width as f64, args.height as f64);
+                let c = &Context::abs(args.width as f64, args.height as f64);
                 c.rgb(1.0, 1.0, 1.0).draw(gl);
 
                 let initial_pos = [((600u32 / 2) - 150) as f64, 0.0];

@@ -2,16 +2,19 @@
 
 #[phase(plugin, link)]
 extern crate conrod;
-extern crate piston;
+extern crate event;
+extern crate input;
 extern crate collections;
 extern crate string_telephone;
 extern crate opengl_graphics;
 extern crate sdl2_window;
+extern crate shader_version;
+extern crate graphics;
 
 use opengl_graphics::Gl;
 use conrod::UiContext;
 
-use piston::{EventIterator, EventSettings, WindowSettings, AssetStore};
+use event::{EventIterator, EventSettings, WindowSettings};
 use sdl2_window::Sdl2Window;
 
 pub mod scene;
@@ -23,7 +26,7 @@ pub mod player;
 
 fn main() {
 
-    let opengl = piston::shader_version::opengl::OpenGL_3_2;
+    let opengl = shader_version::opengl::OpenGL_3_2;
     let mut window = Sdl2Window::new(
         opengl,
         WindowSettings {
@@ -40,7 +43,7 @@ fn main() {
         max_frames_per_second: 60,
     };
 
-    let mut gamestate = gamestate::GameState::new(UiContext::new("Dense-Regular.otf", None), Gl::new(opengl), &AssetStore::from_folder("../assets"));
+    let mut gamestate = gamestate::GameState::new(UiContext::new("Dense-Regular.otf", None), Gl::new(opengl), &Path::new("../assets"));
     let mut current_scene = connectscene::ConnectScene::new();
 
     for ref e in EventIterator::new(&mut window, &event_settings) {

@@ -1,4 +1,4 @@
-use piston::Event;
+use event::Event;
 use gamestate::GameState;
 
 pub type BoxedScene = Box<Scene + 'static>;
