@@ -14,8 +14,9 @@ extern crate graphics;
 use opengl_graphics::Gl;
 use conrod::UiContext;
 
-use event::{EventIterator, EventSettings, WindowSettings};
+use event::{Events, WindowSettings};
 use sdl2_window::Sdl2Window;
+use std::cell::RefCell;
 
 pub mod scene;
 pub mod connectscene;
@@ -27,7 +28,7 @@ pub mod player;
 fn main() {
 
     let opengl = shader_version::opengl::OpenGL_3_2;
-    let mut window = Sdl2Window::new(
+    let window = Sdl2Window::new(
         opengl,
         WindowSettings {
             title: "SuperMegaTag".to_string(),
@@ -37,16 +38,12 @@ fn main() {
             samples: 4,
         }
     );
-
-    let event_settings = EventSettings {
-        updates_per_second: 120,
-        max_frames_per_second: 60,
-    };
+    let window = RefCell::new(window);
 
     let mut gamestate = gamestate::GameState::new(UiContext::new("Dense-Regular.otf", None), Gl::new(opengl), &Path::new("../assets"));
     let mut current_scene = connectscene::ConnectScene::new();
 
-    for ref e in EventIterator::new(&mut window, &event_settings) {
+    for ref e in Events::new(&window) {
         gamestate.get_uic().handle_event(e);
         match current_scene.handle_event(e, &mut gamestate) {
             Some(scene) => current_scene = scene,

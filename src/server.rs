@@ -3,11 +3,12 @@ extern crate string_telephone;
 extern crate collections;
 
 use std::io::net::ip::{Ipv4Addr, SocketAddr};
-use event::{EventIterator, EventSettings, WindowSettings, NoWindow, Update};
+use event::{Events, WindowSettings, NoWindow, Update};
 use string_telephone::{Server, ConnectionConfig, UserPacket, Command, PacketDisconnect, PacketConnect};
 use std::rand;
 use std::rand::{Rng, TaskRng};
 use std::time::duration::Duration;
+use std::cell::RefCell;
 
 pub mod packet;
 pub mod player;
@@ -28,18 +29,14 @@ fn update_tagged_player_validity(rng: &mut TaskRng, players: &Vec<(SocketAddr, p
 }
 
 fn main() {
-    let mut window = NoWindow::new(WindowSettings {
+    let window = NoWindow::new(WindowSettings {
         title: "SuperMegaTag".to_string(),
         size: [0u32, 0u32],
         samples: 0,
         fullscreen: false,
         exit_on_esc: true,
     });
-
-    let game_iter_settings = EventSettings {
-        updates_per_second: 120,
-        max_frames_per_second: 60,
-    };
+    let window = RefCell::new(window);
 
     let settings = ConnectionConfig {
         protocol_id: 88869,
@@ -67,7 +64,7 @@ fn main() {
     let broadcast_rate = 1.0 / 20.0;
     let mut tagged_player = 0;
 
-    for e in EventIterator::new(&mut window, &game_iter_settings) {
+    for e in Events::new(&window) {
         match e {
             Update(update_args) => {
                 clock += update_args.dt;
