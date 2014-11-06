@@ -40,7 +40,9 @@ fn main() {
     );
     let window = RefCell::new(window);
 
-    let mut gamestate = gamestate::GameState::new(UiContext::new("Dense-Regular.otf", None), Gl::new(opengl), &Path::new("../assets"));
+    let context = UiContext::new(&Path::new("../assets/Dense-Regular.otf"), None).ok().expect("Couldn't get a graphics context!");
+
+    let mut gamestate = gamestate::GameState::new(context, Gl::new(opengl), &Path::new("../assets"));
     let mut current_scene = connectscene::ConnectScene::new();
 
     for ref e in Events::new(&window) {
