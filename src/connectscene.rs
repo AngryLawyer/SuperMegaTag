@@ -5,7 +5,7 @@ use string_telephone::{Client, ConnectionConfig, ClientConnectionConfig};
 use scene::{Scene,BoxedScene};
 use gamescene::GameScene;
 use gamestate::GameState;
-use graphics::Context;
+use graphics::{Context, AddColor, Draw};
 use conrod::{
     Label,
     Color,
@@ -85,7 +85,7 @@ impl Scene for ConnectScene {
 
                 gl.viewport(0, 0, args.width as i32, args.height as i32);
 
-                let c = &Context::abs(args.width as f64, args.height as f64);
+                let c = Context::abs(args.width as f64, args.height as f64);
                 c.rgb(1.0, 1.0, 1.0).draw(gl);
 
                 let initial_pos = [((600u32 / 2) - 150) as f64, 0.0];
@@ -102,7 +102,7 @@ impl Scene for ConnectScene {
                     .dimensions(300.0, 240.0)
                     .each_widget(|uic, num, _, _, pos, dims| {
                         // Now draw the widgets with the given callback.
-                        uic.text_box(2 + num as u64, self.edit_ip.get_mut(num))
+                        uic.text_box(2 + num as u64, self.edit_ip.get_mut(num).unwrap())
                             .font_size(24u32)
                             .dimensions(dims[0], 36.0)
                             .position(pos[0], pos[1])

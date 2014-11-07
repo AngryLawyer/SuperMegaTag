@@ -16,7 +16,7 @@ pub struct GameState {
 }
 
 pub fn load_texture(asset_dir: &Path, path: &Path) -> Texture {
-    let image = asset_dir.join(path).unwrap();
+    let image = asset_dir.join(path);
     Texture::from_path(&image).unwrap()
 }
 
@@ -27,10 +27,10 @@ impl GameState {
             uic: uic,
             gl: gl,
             comms: None,
-            player_tex: load_texture(asset_dir, Path::new("player.png")),
-            player_lit_tex: load_texture(asset_dir, Path::new("player-lit.png")),
-            opponent_tex: load_texture(asset_dir, Path::new("opponent.png")),
-            opponent_lit_tex: load_texture(asset_dir, Path::new("opponent-lit.png")),
+            player_tex: load_texture(asset_dir, &Path::new("player.png")),
+            player_lit_tex: load_texture(asset_dir, &Path::new("player-lit.png")),
+            opponent_tex: load_texture(asset_dir, &Path::new("opponent.png")),
+            opponent_lit_tex: load_texture(asset_dir, &Path::new("opponent-lit.png")),
         }
     }
 

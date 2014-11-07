@@ -1,7 +1,7 @@
 use scene::{Scene, BoxedScene};
 use gamestate::GameState;
 use event::{Render, Event, Update, Input};
-use graphics::Context;
+use graphics::{Context, AddColor, RelativeTransform2d, AddImage, Draw};
 use input;
 use string_telephone::PollDisconnected;
 use packet;
